@@ -11,6 +11,9 @@ using Microsoft.Win32.SafeHandles;
 using System.Diagnostics.CodeAnalysis;
 using Dbg = System.Management.Automation.Diagnostics;
 using System.Management.Automation.Remoting;
+using System.Security.Cryptography;
+
+// using System.Security.Cryptography.RSAOpenSsl;
 
 namespace System.Management.Automation.Internal
 {
@@ -420,6 +423,7 @@ namespace System.Management.Automation.Internal
         private PSSafeCryptKey _hSessionKey;
         // handle to the session key. This can either
         // be generated or imported
+        private RSA _rsaSessionKey = null;
         private bool _sessionKeyGenerated = false;
         // bool indicating if session key was generated before
 
@@ -595,6 +599,16 @@ namespace System.Management.Automation.Internal
 
             byte[] convertedBase64 = Convert.FromBase64String(sessionKey);
 
+            using (SafeRsaHandle rsaHandle = Interop.Crypto.DecodeRsaPublicKey(convertedBase64, convertedBase64.Length))
+            {
+                Interop.Crypto.CheckValidOpenSslHandle(rsaHandle);
+
+                RSAParameters rsaParameters = Interop.Crypto.ExportRsaParameters(rsaHandle, false);
+                RSA rsa = new RSAOpenSsl();
+                rsa.ImportParameters(rsaParameters);
+                _rsaSessionKey = rsa;
+            }
+
             bool ret = PSCryptoNativeUtils.CryptImportKey(_hProv,
                                             convertedBase64,
                                             convertedBase64.Length,
@@ -624,6 +638,8 @@ namespace System.Management.Automation.Internal
             Array.Copy(data, 0, encryptedData, 0, data.Length);
 
             int dataLength = encryptedData.Length;
+
+            byte[] encryptedData2 = _rsaSessionKey.EncryptValue(data);
 
             // encryption always happens using the session key
             bool ret = PSCryptoNativeUtils.CryptEncrypt(_hSessionKey,

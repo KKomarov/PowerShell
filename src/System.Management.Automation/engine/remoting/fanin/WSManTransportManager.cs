@@ -2383,6 +2383,7 @@ namespace System.Management.Automation.Remoting.Client
             if (dataReceived.data != null)
             {
                 tracer.WriteLine("Session Received Data : {0}", dataReceived.data.Length);
+                tracer.WriteLine("Session Received Data : {0}", System.Text.Encoding.ASCII.GetString(dataReceived.data, 0, dataReceived.data.Length));
                 PSEtwLog.LogAnalyticInformational(
                     PSEventId.WSManReceiveShellOutputExCallbackReceived, PSOpcode.Receive, PSTask.None,
                     PSKeyword.Transport | PSKeyword.UseAlwaysAnalytic,
@@ -2420,6 +2421,7 @@ namespace System.Management.Automation.Remoting.Client
         private void SendData(byte[] data, DataPriorityType priorityType)
         {
             tracer.WriteLine("Session sending data of size : {0}", data.Length);
+            tracer.WriteLine("Session sending data : {0}", System.Text.Encoding.ASCII.GetString(data, 0, data.Length));
             byte[] package = data;
 
             #region SHIM: Redirection code for session data send.
@@ -2963,6 +2965,8 @@ namespace System.Management.Automation.Remoting.Client
         internal override void CreateAsync()
         {
             byte[] cmdPart1 = serializedPipeline.ReadOrRegisterCallback(null);
+            tracer.WriteLine("Send cmd line : {0}", _cmdLine);
+            tracer.WriteLine("Send cmd args : {0}", System.Text.Encoding.ASCII.GetString(cmdPart1, 0, cmdPart1.Length));
             if (cmdPart1 != null)
             {
                 #region SHIM: Redirection code for command code send.
@@ -3657,6 +3661,7 @@ namespace System.Management.Automation.Remoting.Client
             if (dataReceived.data != null)
             {
                 tracer.WriteLine("Cmd Received Data : {0}", dataReceived.data.Length);
+                tracer.WriteLine("Cmd Received Data : {0}", System.Text.Encoding.ASCII.GetString(dataReceived.data, 0, dataReceived.data.Length));
                 PSEtwLog.LogAnalyticInformational(
                     PSEventId.WSManReceiveShellOutputExCallbackReceived, PSOpcode.Receive, PSTask.None,
                     PSKeyword.Transport | PSKeyword.UseAlwaysAnalytic,
@@ -3874,6 +3879,8 @@ namespace System.Management.Automation.Remoting.Client
         private void SendData(byte[] data, DataPriorityType priorityType)
         {
             tracer.WriteLine("Command sending data of size : {0}", data.Length);
+            tracer.WriteLine("Command sending data : {0}", System.Text.Encoding.ASCII.GetString(data, 0, data.Length));
+
             byte[] package = data;
 
             #region SHIM: Redirection code for command data send.
