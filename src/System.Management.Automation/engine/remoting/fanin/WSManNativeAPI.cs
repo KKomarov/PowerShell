@@ -1924,8 +1924,8 @@ namespace System.Management.Automation.Remoting.Client
                         0,
                         result1.data.binaryData.bufferLength);
                 }
-                Dbg.Assert(result1.data.type == (uint)WSManDataType.WSMAN_DATA_TYPE_BINARY,
-                    "ReceiveDataResult can receive only binary data");
+                //Dbg.Assert(result1.data.type == (uint)WSManDataType.WSMAN_DATA_TYPE_BINARY,
+                //    "ReceiveDataResult can receive only binary data");
 
                 WSManReceiveDataResult result = new WSManReceiveDataResult();
                 result.data = dataRecvd;
